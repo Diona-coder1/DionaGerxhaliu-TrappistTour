@@ -1,0 +1,7 @@
+numpy>=1.22
+scipy>=1.8
+matplotlib>=3.5
+pytest>=7
+# Optional - only to re-check results with the official ESA code:
+# pykep>=2.6,<3   (conda install -c conda-forge pykep pygmo)
+# pygmo>=2.18

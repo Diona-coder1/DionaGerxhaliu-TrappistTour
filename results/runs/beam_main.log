@@ -1,0 +1,16 @@
+675 feasible entry nodes (3.6s)
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/vec.py:108: RuntimeWarning: invalid value encountered in divide
+  ih /= _norm(ih)[:, None]
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/vec.py:109: RuntimeWarning: invalid value encountered in divide
+  lam2 = 1.0 - cn / s
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/vec.py:116: RuntimeWarning: overflow encountered in power
+  T = np.sqrt(2.0 * mu / s ** 3) * tof
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/vec.py:116: RuntimeWarning: overflow encountered in power
+  T = np.sqrt(2.0 * mu / s ** 3) * tof
+  level 1:   2156 candidates, kept   150, best DV      0.0 m/s, best T+h  1805.8 d  (269.1s)
+  level 2:   2218 candidates, kept   150, best DV      0.0 m/s, best T+h  1740.2 d  (136.5s)
+  level 3:   1941 candidates, kept   150, best DV      0.0 m/s, best T+h  1711.3 d  (121.0s)
+  level 4:   1298 candidates, kept   150, best DV      2.0 m/s, best T+h  1712.3 d  (99.1s)
+  level 5:    727 candidates, kept   150, best DV      2.4 m/s, best T+h  1707.7 d  (79.9s)
+  level 6:    364 candidates, kept   364, best DV      9.2 m/s, best T+h  1710.4 d  (59.6s)
+complete feasible tours: 364   HV = 5,482,582   time 769s

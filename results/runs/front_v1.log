@@ -1,0 +1,65 @@
+364 input solutions, HV before refinement = 5,482,582
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/astro.py:389: RuntimeWarning: divide by zero encountered in scalar divide
+  Ft = -math.sqrt(-mu * a) / (r * R) * sH
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/astro.py:390: RuntimeWarning: divide by zero encountered in scalar divide
+  Gt = 1.0 - a / r * (1.0 - cH)
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/astro.py:393: RuntimeWarning: invalid value encountered in scalar add
+  vn = (Ft * r0[0] + Gt * v0[0], Ft * r0[1] + Gt * v0[1], Ft * r0[2] + Gt * v0[2])
+/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/astro.py:107: RuntimeWarning: invalid value encountered in scalar divide
+  i = _acos(h[2] / Hn)
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ~~~~^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/multiprocessing/pool.py", line 48, in mapstar
+    return list(map(*args))
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/run_front.py", line 50, in _trace
+    return trace_front(x, step=step, maxiter=maxiter)
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/local.py", line 91, in trace_front
+    p = polish(x, maxiter=maxiter)
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/local.py", line 67, in polish
+    res = minimize(f, z0, method="SLSQP", bounds=[(0, 1)] * 27, constraints=cons,
+                   options={"maxiter": maxiter, "ftol": 1e-6, "eps": 1e-7})
+  File "/usr/local/lib/python3.13/dist-packages/scipy/optimize/_minimize.py", line 796, in minimize
+    res = _minimize_slsqp(fun, x0, args, jac, bounds,
+                          constraints, callback=callback, **options)
+  File "/usr/local/lib/python3.13/dist-packages/scipy/optimize/_slsqp_py.py", line 529, in _minimize_slsqp
+    fx = sf.fun(x)
+  File "/usr/local/lib/python3.13/dist-packages/scipy/optimize/_differentiable_functions.py", line 394, in fun
+    self._update_fun()
+    ~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/dist-packages/scipy/optimize/_differentiable_functions.py", line 362, in _update_fun
+    fx = self._wrapped_fun(self.x)
+  File "/usr/local/lib/python3.13/dist-packages/scipy/_lib/_util.py", line 544, in __call__
+    fx = self.f(np.copy(x), *self.args)
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/local.py", line 47, in f
+    dv, T, eq, iq = udp.fitness(full(z))
+                    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/problem.py", line 175, in fitness
+    close, d = self._check_distance(r, v_beg_l, (1 - etas[i]) * T[i + 1])
+               ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/problem.py", line 106, in _check_distance
+    a, e, _, _, _, E0 = ic2par(r0, v0, mu)
+                        ~~~~~~^^^^^^^^^^^^
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/../trappist/astro.py", line 106, in ic2par
+    a = p / (1.0 - e * e)
+        ~~^~~~~~~~~~~~~~~
+ZeroDivisionError: float division by zero
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/run_front.py", line 99, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude/dionagerxhaliu-trappisttour/scripts/run_front.py", line 72, in main
+    curves = pool.map(_trace, [(x, a.step, a.maxiter) for x, _ in starts])
+  File "/usr/lib/python3.13/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/multiprocessing/pool.py", line 774, in get
+    raise self._value
+ZeroDivisionError: float division by zero
