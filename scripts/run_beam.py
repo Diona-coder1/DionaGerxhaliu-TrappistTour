@@ -27,11 +27,13 @@ def main():
     ap.add_argument("--no-screen", action="store_true")
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--offsets", type=float, nargs="*", default=[0.0],
+                    help="entry-time offsets (days) w.r.t. the DV_init-optimal T0")
     ap.add_argument("--out", default="results/runs/beam_main.pkl")
     a = ap.parse_args()
 
     t0 = time.time()
-    roots = entry_nodes(n_u=a.nu, n_v=a.nv)
+    roots = entry_nodes(n_u=a.nu, n_v=a.nv, T0_offsets=tuple(a.offsets))
     print(f"{len(roots)} feasible entry nodes ({time.time() - t0:.1f}s)", flush=True)
     kw = dict(de_G=a.de_G, use_de=not a.no_de, use_screen=not a.no_screen, seed=a.seed)
     with Pool(a.workers) as pool:

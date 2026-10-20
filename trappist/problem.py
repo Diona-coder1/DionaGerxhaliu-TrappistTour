@@ -120,7 +120,16 @@ class TrappistTour:
     def fitness(self, x, details=False):
         """Returns (DV, T, eq_constraint, ineq_constraint).
 
-        With details=True also returns a dict describing every leg."""
+        With details=True also returns a dict describing every leg.
+        Degenerate inputs (division by zero, NaN states) are reported as
+        infeasible instead of raising, so optimisers can keep going."""
+        try:
+            return self._fitness(x, details)
+        except (ZeroDivisionError, ValueError, OverflowError):
+            T = [x[2]] + list(x[6:27:4])
+            return self._penalty(len(set(int(i) for i in x[-7:])) - 7, T, details)
+
+    def _fitness(self, x, details=False):
         xc, xi = x[:-7], x[-7:]
         seq = [PLANETS[int(i)] for i in xi]
         eq_constraint = len(set(int(i) for i in xi)) - 7

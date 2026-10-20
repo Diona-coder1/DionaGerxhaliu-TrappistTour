@@ -1,0 +1,4 @@
+++ dirname scripts/run_experiments.sh
++ cd scripts/..
++ R=results/runs
++ python3 -W ignore scripts/run_beam.py --width 300 --root-width 300 --seed 1 --out results/runs/beam_w300.pkl
