@@ -2,3 +2,11 @@
 + cd scripts/..
 + R=results/runs
 + python3 -W ignore scripts/run_beam.py --width 300 --root-width 300 --seed 1 --out results/runs/beam_w300.pkl
++ python3 -W ignore scripts/run_beam.py --width 75 --root-width 120 --out results/runs/beam_w75.pkl
++ python3 -W ignore scripts/run_beam.py --width 30 --root-width 60 --out results/runs/beam_w30.pkl
++ python3 -W ignore scripts/run_beam.py --width 10 --root-width 20 --out results/runs/beam_w10.pkl
++ python3 -W ignore scripts/run_beam.py --width 1 --root-width 1 --out results/runs/greedy.pkl
++ python3 -W ignore scripts/run_beam.py --width 50 --root-width 80 --no-de --out results/runs/abl_screen_only.pkl
++ python3 -W ignore scripts/run_beam.py --width 50 --root-width 80 --no-screen --out results/runs/abl_de_only.pkl
++ python3 -W ignore scripts/run_beam.py --width 50 --root-width 80 --out results/runs/beam_w50.pkl
++ python3 -W ignore scripts/run_beam.py --width 150 --root-width 300 --offsets -40 -80 --seed 2 --out results/runs/beam_offsets.pkl

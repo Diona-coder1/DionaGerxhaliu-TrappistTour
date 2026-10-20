@@ -249,13 +249,18 @@ def select(nodes, width, lams=(0.0, 1.0, 2.0, 4.0, 8.0, 16.0), per_key=None):
     if len(nodes) <= width:
         return nodes
     per_key = per_key or max(4, width // 20)
+    if width < len(lams):          # e.g. greedy (width 1): use the middle weights
+        lams = [lams[round(k * (len(lams) - 1) / max(1, width - 1))] for k in range(width)] if width > 1 \
+            else [lams[len(lams) // 2]]
     chosen, seen, count = [], set(), {}
-    per_slice = max(1, width // len(lams))
+    per_slice = math.ceil(width / len(lams))
     for lam in lams:
+        if len(chosen) >= width:
+            break
         order = sorted(range(len(nodes)), key=lambda k: nodes[k].dv + lam * (nodes[k].T + nodes[k].h()))
         taken = 0
         for k in order:
-            if taken >= per_slice:
+            if taken >= per_slice or len(chosen) >= width:
                 break
             if k in seen:
                 continue
