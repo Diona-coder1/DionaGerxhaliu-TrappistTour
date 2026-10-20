@@ -42,7 +42,7 @@ gjenerike (kërkim i rastësishëm, NSGA-II), te ato që shfrytëzojnë struktur
 (kërkim *greedy*, *beam search* shumë-objektiv me dekompozim sipas hapave, CMA-ES lokal dhe
 programim dinamik për zgjedhjen optimale të nënbashkësisë).
 
-**Rezultati kryesor.** {{REZULTATI_KRYESOR}}
+**Rezultati kryesor.** Pipeline-i i propozuar arrin hipervëllim **5,635,615** (rezultati në platformë: $-5,635,615$) me 40 zgjidhje, që do ta vendoste në **vendin e 3-të** të renditjes zyrtare të SpOC 2022. Algoritmet gjenerike, me buxhet të krahasueshëm llogaritës, nuk gjejnë asnjë zgjidhje brenda pikës referuese (hipervëllim 0).
 
 # Formulimi i problemit
 
@@ -59,6 +59,8 @@ Kodi zyrtar përdor një vektor me 34 komponentë:
 | | $\eta_k$ | pjesa e hapit pas së cilës bëhet DSM | $[0.001, 0.999]$ |
 | | $T_k$ | kohëzgjatja e hapit (ditë) | $[5, 2000]$ |
 | renditja | $s_0,\dots,s_6$ | permutacion i $\{0,\dots,6\}$ | numra të plotë |
+
+: Vektori i vendimeve (34 komponentë).
 
 ## Modeli fizik (si e llogarit kodi zyrtar)
 
@@ -270,29 +272,67 @@ entry_nodes  →  A4 beam search (disa ekzekutime)  →  bashkimi i tureve
 **Mjedisi.** Python 3.13, NumPy, SciPy; 2 bërthama CPU. Çdo vlerësim i fitnesit kushton
 $\approx 0.8$ ms në Python të pastër; vlerësimi i vektorizuar i një hapi $\approx 3$–$10\ \mu$s.
 
-{{TABELA_REZULTATEVE}}
+Tabela 2 përmbledh të gjitha ekzekutimet. Algoritmet e rastësishme janë ekzekutuar me 3 farë (*seeds*), beam search-i është determinist për një farë të dhënë.
+
+| Algoritmi | HV | ΔV min [m/s] | T min* [d] | # të lejuara | Koha [s] | Ekz. |
+|:----------------------------------------------|---------:|------:|------:|------:|-----:|---:|
+| A1 Kërkim i rastësishëm (100k vlerësime, 3 farë) | 0 | 32,596.9 | – | 7 | 198 | 3 |
+| A2 NSGA-II (100k vlerësime, 3 farë) | 0 | 6,141.9 | – | 18,160 | 227 | 3 |
+| A3 Greedy (B = 1) | 0 | – | – | 0 | 6 | 1 |
+| A4 Beam search, B = 10 | 5,225,697 | 36.6 | 1,866.2 | 25 | 67 | 1 |
+| A4 Beam search, B = 30 | 5,318,222 | 36.6 | 1,780.9 | 76 | 179 | 1 |
+| A4 Beam search, B = 50 | 5,408,991 | 17.2 | 1,771.3 | 127 | 251 | 1 |
+| A4 Beam search, B = 75 | 5,418,733 | 14.5 | 1,710.4 | 207 | 382 | 1 |
+| A4 Beam search, B = 150 | 5,482,582 | 9.2 | 1,710.4 | 364 | 769 | 1 |
+| A4 Beam search, B = 300 | 5,572,792 | 9.6 | 1,691.1 | 687 | 1,389 | 1 |
+| A4 vetëm Lambert-screening, B = 50 | 0 | – | – | 0 | 78 | 1 |
+| A4 vetëm DE, B = 50 | 5,388,159 | 40.2 | 1,703.3 | 90 | 162 | 1 |
+| A4 B = 150, T0 i zhvendosur (−40, −80 d) | 3,747,060 | 710.5 | 1,821.4 | 364 | 849 | 1 |
+| A4 B = 300, farë 3, DE G = 90, T0 (0, −20 d) | 5,626,487 | 0.1 | 1,689.6 | 677 | 1,818 | 1 |
+| **Pipeline i plotë A4+A5+A6 (40 zgjidhje)** | **5,635,615** | 0.1 | 1,689.6 | 40 | – | 1 |
+
+: Krahasimi i algoritmeve (HV = hipervëllimi, sa më i madh aq më mirë; T min = koha më e shkurtër ndër zgjidhjet me ΔV < 2500 m/s).
+
 
 ## Krahasimi i algoritmeve
 
-![Frontet Pareto të algoritmeve të ndryshme.](../figures/fronti_pareto.png){width=80%}
+![Frontet Pareto (zmadhuar). A1, A2 dhe A3 nuk kanë asnjë pikë brenda pikës referuese, prandaj nuk shfaqen.](../figures/fronti_pareto.png){width=80%}
 
-{{DISKUTIMI_KRAHASIMIT}}
+* **Kërkimi i rastësishëm** gjen mesatarisht vetëm 7 zgjidhje të lejuara në 100 000 vlerësime, dhe më e mira ka $\Delta V = 32.6$ km/s, 13 herë mbi kufirin prej 2.5 km/s. Kjo tregon se zgjidhjet e mira zënë një pjesë jashtëzakonisht të vogël të hapësirës.
+* **NSGA-II** gjen shumë zgjidhje të lejuara (mesatarisht 18,160), por më e mira ka $\Delta V = 6.1$ km/s, pra hipervëllimi mbetet 0. Operatorët gjenerikë (SBX, OX1) nuk mund t'i ndjekin luginat e ngushta të zgjidhjeve balistike: ndryshimi i një kohe me pak sekonda pa ndryshuar fly-by-n njëkohësisht prish gjithë turin (shih seksionin 4e). Edhe renditja e planetëve ndryshon kuptimin e të gjitha gjeneve të tjera, prandaj kryqëzimi i dy prindërve të mirë rrallë jep fëmijë të mirë.
+* **Greedy** (B = 1) dështon plotësisht: zgjedh hyrjen me shpejtësinë relative më të vogël (në dukje më e mira), por nga ajo gjendje asnjë hap i mëtejshëm nuk përshtatet brenda buxhetit prej 2500 m/s. Mungesa e kthimit prapa (*backtracking*) e çon në rrugë qorre.
+* **Beam search** me vetëm B = 10 jep tashmë 5,225,697 brenda 67 s. Kjo konfirmon se dekompozimi sipas hapave, jo fuqia llogaritëse, është çelësi.
+
 
 ## Shkallëzimi sipas gjerësisë së beam-it
 
 ![Hipervëllimi dhe koha e ekzekutimit në funksion të gjerësisë $B$.](../figures/shkallezimi_beam.png){width=95%}
 
-{{DISKUTIMI_SHKALLEZIMIT}}
+Koha e ekzekutimit rritet **linearisht** me gjerësinë: përshtatja $t(B) \approx 4.58\,B + 37$ s ka $R^2 = 0.998$, siç parashikon analiza teorike $O(n^2 B (m + W N_P G))$. Cilësia rritet në mënyrë monotone por me kthim zvogëlues (*diminishing returns*): nga B = 150 në B = 300 koha dyfishohet (13 → 23 min) ndërsa HV rritet me 1.6%. Kjo është sjellja tipike e beam search-it: gjerësia kontrollon kompromisin mes cilësisë dhe kohës.
 
 ## Ablacionet
 
-{{DISKUTIMI_ABLACIONIT}}
+Për të kuptuar rolin e secilit komponent të gjenerimit të fëmijëve, me B = 50:
+
+* **Vetëm Lambert-screening** (pa DE): **asnjë tur i plotë.** Modeli me DSM te planeti është shumë pesimist kur fly-by nuk mund ta kthejë shpejtësinë mjaftueshëm (planete të lehta ose shpejtësi relative e madhe): atëherë DSM duhet bërë larg, pranë apoapsit, ku kushton shumë më pak. Në këto raste kostoja e vlerësuar ishte dhjetëra km/s, kurse në modelin e saktë 60–130 m/s.
+* **Vetëm DE** (pa screening): HV = 5,388,159 në 162 s, që është 0.4% më pak se hibridi (5,408,991). DE vetë gjen hapa të mirë, por zgjidhjet balistike janë minimume shumë të ngushta që DE i gjen vetëm rastësisht.
+* **Hibridi** kombinon të dyja: screening jep pika nisjeje balistike (0 m/s) për DE, dhe DE trajton rastet ku duhet DSM në hapësirë të thellë.
+
+Përfundimi i ablacionit: komponentët plotësojnë njëri-tjetrin, dhe DE në modelin e saktë është komponenti i domosdoshëm.
 
 # Rezultati final
 
-{{REZULTATI_FINAL}}
+Pipeline-i final bashkon turet e plota nga të gjitha ekzekutimet e beam search-it, i lustron me CMA-ES dhe zgjedh me programim dinamik nënbashkësinë optimale. Rezultati:
 
-![Hipervëllimi i 100 zgjidhjeve të zgjedhura.](../figures/hipervellimi_final.png){width=75%}
+* **Hipervëllimi: 5,635,615** (rezultati në Optimize: $-5,635,615.166$), me 40 zgjidhje (fronti ka më pak se 100 pika jo-të-dominuara, prandaj përdoren të gjitha).
+* Zgjidhja më ekonomike: $\Delta V = 0.1$ m/s për 2168 ditë.
+* Zgjidhja më e shpejtë: 1690 ditë për $\Delta V = 2109$ m/s.
+* Krahasuar me renditjen zyrtare të SpOC 2022 (1. Space Coders 5 870 437; 2. fcmaes 5 731 152; 3. Team HRI 5 601 396; 4. haiven 5 503 791), rezultati do të ishte në **vendin e 3-të** nga 20 ekipe.
+* Çdo vektor në `results/final/submission.json` është rivlerësuar me funksionin e fitnesit dhe i plotëson të dy kufizimet.
+
+Turet e mira kanë të njëjtën strukturë: hyrje me $T_0 \approx 1500$ ditë dhe $\Delta V_{init} \approx 0$; fly-by i parë kap sondën në një orbitë me periodë 120–200 ditë; fly-by-t e mëpasshëm e zvogëlojnë periodën hap pas hapi (p.sh. 158 → 79 → 53 → 45 → 34 ditë), dhe hapat e fundit zgjasin vetëm 20–35 ditë. Planeti c (i dyti nga ylli) shfaqet shpesh si planet i parë: ka masë të madhe dhe është afër yllit, kështu që fly-by i tij e ndryshon shumë orbitën.
+
+![Hipervëllimi i zgjidhjeve të zgjedhura.](../figures/hipervellimi_final.png){width=75%}
 
 ![Trajektorja me $\Delta V$ minimal.](../figures/trajektorja_dv_min.png){width=100%}
 
@@ -300,13 +340,19 @@ $\approx 0.8$ ms në Python të pastër; vlerësimi i vektorizuar i një hapi $\
 
 # Përfundime
 
-{{PERFUNDIME}}
+1. **Analiza e strukturës ia vlen më shumë se fuqia llogaritëse.** Hyrja pothuajse e ndarë, kostot në formë 'V' dhe luginat e ngushta shpjegojnë pse algoritmet gjenerike dështojnë dhe drejtuan dizajnin e algoritmit kryesor.
+2. **Dekompozimi + beam search** e kthen një problem 34-dimensional të përzier në një varg nënproblemesh 4-dimensionale, me kosto lineare në gjerësinë $B$ dhe polinomiale në numrin e planetëve, në vend të $O(n!)$.
+3. **Greedy dështon** sepse vendimet e hershme (hyrja, fly-by i parë) përcaktojnë se çfarë është e mundur më vonë; beam search me *lookahead* zgjidh këtë me kosto të kontrolluar.
+4. **Algoritmet ndihmëse** kanë rol të qartë: Lambert-screening (shpejtësi), DE (saktësi në modelin real), CMA-ES (kondicionimi i keq), programimi dinamik (zgjedhja optimale, $O(kn^2)$, e provuar me kërkim shterues).
+5. **Vërtetimi i modelit** me integrim numerik të pavarur na lejoi të punojmë pa bibliotekat zyrtare dhe zbuloi veçori të kodit zyrtar (p.sh. periapsi negativ për hiperbola) që ndikojnë drejtpërdrejt në hapësirën e zgjidhjeve.
+
+**Punë e ardhshme.** (i) Beam më i gjerë ose disa ekzekutime paralele (cilësia rritet me $B$); (ii) *lookahead* më i saktë, p.sh. kosto minimale e vlerësuar e hapave të mbetur; (iii) optimizim lokal që ruan strukturën (ndryshim i njëkohshëm i kohës dhe i fly-by-t) për të mbushur boshllëqet e frontit; (iv) implementim në C/Numba për 10–50× shpejtësi.
 
 # Si të ekzekutohet kodi
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q tests                      # verifikimi i modelit
+python tests/test_astro.py && python tests/test_vec.py && python tests/test_hv.py
 python scripts/run_beam.py --width 150         # A4 (~13 min në 2 bërthama)
 python scripts/run_baselines.py --algo nsga2   # A2
 python scripts/make_final.py results/runs/beam_*.pkl --out results/final

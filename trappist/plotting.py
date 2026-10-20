@@ -51,10 +51,10 @@ def trajectory_arcs(x):
     return arcs, events
 
 
-def plot_trajectory(x, path, title=None, zoom=0.12):
+def plot_trajectory(x, path, title=None, zoom=0.075):
     arcs, events = trajectory_arcs(x)
-    fig, axes = plt.subplots(1, 2, figsize=(13, 6.2))
-    for ax, lim, show_entry in ((axes[0], zoom, False), (axes[1], 10.5, True)):
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6.2))
+    for ax, lim, show_entry in ((axes[0], zoom, False), (axes[1], 0.6, False), (axes[2], 10.5, True)):
         ax.scatter([0], [0], color="orange", s=60 if show_entry else 120, zorder=5, label="TRAPPIST-1")
         th = np.linspace(0, 2 * np.pi, 200)
         for k, p in enumerate(PLANETS):
@@ -62,22 +62,23 @@ def plot_trajectory(x, path, title=None, zoom=0.12):
             ax.plot(a * np.cos(th), a * np.sin(th), color=COLORS[k], lw=0.6, alpha=0.5)
         for kind, pts in arcs:
             if kind == "entry" and not show_entry:
-                pts = pts[np.linalg.norm(pts, axis=1) < 1.5 * zoom]
+                pts = pts[np.linalg.norm(pts, axis=1) < 1.5 * lim]
                 if len(pts) == 0:
                     continue
             style = {"entry": ("green", 1.2), "coast": ("royalblue", 0.8), "lambert": ("crimson", 0.8)}[kind]
             ax.plot(pts[:, 0], pts[:, 1], color=style[0], lw=style[1])
         for j, t, r in events:
             ax.scatter([r[0] / AU], [r[1] / AU], color=COLORS[j], s=40, zorder=6, edgecolor="k")
-            if not show_entry:
+            if lim < 0.1:
                 ax.annotate(NAMES[j], (r[0] / AU, r[1] / AU), xytext=(4, 4), textcoords="offset points", fontsize=9)
         ax.set_xlim(-lim, lim)
         ax.set_ylim(-lim, lim)
         ax.set_aspect("equal")
         ax.set_xlabel("x [AU]")
         ax.set_ylabel("y [AU]")
-    axes[0].set_title("Turi në sistemin planetar (zoom)")
-    axes[1].set_title("Hyrja nga sfera 10 AU")
+    axes[0].set_title("Takimet me planetët (zoom 0.075 AU)")
+    axes[1].set_title("Orbitat e sondës gjatë turit")
+    axes[2].set_title("Hyrja nga sfera 10 AU")
     axes[0].plot([], [], color="green", label="hyrja (Lambert)")
     axes[0].plot([], [], color="royalblue", label="lundrim pas fly-by")
     axes[0].plot([], [], color="crimson", label="hark Lambert pas DSM")
@@ -107,6 +108,9 @@ def plot_fronts(series, path, title="Fronti Pareto (ΔV kundrejt kohës)"):
     ax.axvline(REF[0], color="k", ls=":", lw=0.8)
     ax.axhline(REF[1], color="k", ls=":", lw=0.8)
     ax.set_xlim(-50, REF[0] + 100)
+    allp = np.vstack([np.asarray(p, dtype=float)[nondominated(np.asarray(p, dtype=float))]
+                      for _, p, _ in series if len(p) and len(nondominated(np.asarray(p, dtype=float)))])
+    ax.set_ylim(allp[:, 1].min() - 60, min(REF[1], allp[:, 1].max() + 150))
     ax.set_xlabel("ΔV total [m/s]")
     ax.set_ylabel("Koha totale e misionit [ditë]")
     ax.set_title(title)

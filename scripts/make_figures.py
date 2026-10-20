@@ -47,7 +47,7 @@ def summary_row(label, ds):
         return None
     hvs = [hypervolume(pts_of(d)) for d in ds]
     secs = [d["seconds"] for d in ds]
-    nfeas = [len(d["solutions"]) for d in ds]
+    nfeas = [d.get("n_feasible", len(d["solutions"])) for d in ds]
     best = [min((f[0] for _, f in d["solutions"]), default=float("nan")) for d in ds]
     fast = [min((f[1] for _, f in d["solutions"] if f[0] < REF[0]), default=float("nan")) for d in ds]
     return (label, np.mean(hvs), np.std(hvs), np.nanmin(best), np.nanmin(fast), np.mean(nfeas), np.mean(secs), len(ds))
@@ -57,15 +57,16 @@ def main():
     rows = []
     rnd = [load(f"random_s{s}.pkl") for s in range(3)]
     nsg = [load(f"nsga2_s{s}.pkl") for s in range(3)]
-    rows.append(summary_row("A1 Kërkim i rastësishëm (100k vlerësime)", rnd))
-    rows.append(summary_row("A2 NSGA-II (100k vlerësime)", nsg))
-    rows.append(summary_row("A3 Greedy (beam, gjerësia 1)", [load("greedy.pkl")]))
+    rows.append(summary_row("A1 Kërkim i rastësishëm (100k vlerësime, 3 farë)", rnd))
+    rows.append(summary_row("A2 NSGA-II (100k vlerësime, 3 farë)", nsg))
+    rows.append(summary_row("A3 Greedy (B = 1)", [load("greedy.pkl")]))
     for w in (10, 30, 50, 75, 150, 300):
         name = "beam_main.pkl" if w == 150 else f"beam_w{w}.pkl"
-        rows.append(summary_row(f"A4 Beam search hibrid, B = {w}", [load(name)]))
-    rows.append(summary_row("A4 Ablacion: vetëm Lambert-screening (B = 50)", [load("abl_screen_only.pkl")]))
-    rows.append(summary_row("A4 Ablacion: vetëm DE (B = 50)", [load("abl_de_only.pkl")]))
-    rows.append(summary_row("A4 Beam me T0 të zhvendosur (-40, -80 d)", [load("beam_offsets.pkl")]))
+        rows.append(summary_row(f"A4 Beam search, B = {w}", [load(name)]))
+    rows.append(summary_row("A4 vetëm Lambert-screening, B = 50", [load("abl_screen_only.pkl")]))
+    rows.append(summary_row("A4 vetëm DE, B = 50", [load("abl_de_only.pkl")]))
+    rows.append(summary_row("A4 B = 150, T0 i zhvendosur (−40, −80 d)", [load("beam_offsets.pkl")]))
+    rows.append(summary_row("A4 B = 300, farë 3, DE G = 90, T0 (0, −20 d)", [load("beam_w300_s3.pkl")]))
     rows = [r for r in rows if r is not None]
 
     final = None
@@ -74,15 +75,15 @@ def main():
             final = pickle.load(fh)
 
     with open("results/summary.md", "w") as fh:
-        fh.write("| Algoritmi | HV (mesatare) | σ | ΔV më i vogël [m/s] | T më e shkurtër* [d] | # zgjidhje të lejuara | Koha [s] | # ekzekutime |\n")
-        fh.write("|---|---:|---:|---:|---:|---:|---:|---:|\n")
+        fh.write("| Algoritmi | HV | ΔV min [m/s] | T min* [d] | # të lejuara | Koha [s] | Ekz. |\n")
+        fh.write("|:----------------------------------------------|---------:|------:|------:|------:|-----:|---:|\n")
+        fmt = lambda v, d=1: "–" if not np.isfinite(v) else f"{v:,.{d}f}"
         for r in rows:
-            fh.write(f"| {r[0]} | {r[1]:,.0f} | {r[2]:,.0f} | {r[3]:,.1f} | {r[4]:,.1f} | {r[5]:,.0f} | {r[6]:,.0f} | {r[7]} |\n")
+            fh.write(f"| {r[0]} | {r[1]:,.0f} | {fmt(r[3])} | {fmt(r[4])} | {r[5]:,.0f} | {r[6]:,.0f} | {r[7]} |\n")
         if final:
             P = np.array([f[:2] for _, f in final["final"]])
-            fh.write(f"| **A4+A5+A6 Pipeline i plotë (100 zgjidhje)** | **{final['hv']:,.0f}** | – | "
+            fh.write(f"| **Pipeline i plotë A4+A5+A6 ({len(P)} zgjidhje)** | **{final['hv']:,.0f}** | "
                      f"{P[:, 0].min():,.1f} | {P[P[:, 0] < REF[0], 1].min():,.1f} | {len(P)} | – | 1 |\n")
-        fh.write("\n*koha më e shkurtër ndër zgjidhjet me ΔV < 2500 m/s\n")
     print(open("results/summary.md").read())
 
     # ---- Fig 1: fronts
@@ -97,7 +98,7 @@ def main():
         if d:
             series.append((f"A4 Beam B={w}", pts_of(d), dict(color=c, lw=1)))
     if final:
-        series.append(("Pipeline final (100 zgjidhje)", [f[:2] for _, f in final["final"]], dict(color="tab:red", lw=1.6)))
+        series.append((f"Pipeline final ({len(final['final'])} zgjidhje)", [f[:2] for _, f in final["final"]], dict(color="tab:red", lw=1.6)))
     plot_fronts(series, os.path.join(FIG, "fronti_pareto.png"))
 
     # ---- Fig 2: width scaling
@@ -160,10 +161,10 @@ def main():
         r_j, _ = eph_batch(seq[1], t + grid)
         v1, _, _ = lambert_batch(r_i, r_j, grid * DAY2SEC, MU)
         c, _ = flyby_cost(v_in - v_pl, v1 - v_pl, MU_PL[seq[0]])
-        coarse = grid[::100]
+        coarse = grid[37::100]
         fig, ax = plt.subplots(figsize=(6.5, 4))
         ax.plot(grid, c, lw=1, label="kosto e saktë (rrjet i dendur)")
-        ax.plot(coarse, c[::100], "o", ms=4, label="rrjet me hap 0.1 d")
+        ax.plot(coarse, c[37::100], "o", ms=4, label="rrjet me hap 0.1 d")
         ax.set_yscale("log")
         ax.set_xlabel("Kohëzgjatja e hapit T [ditë]")
         ax.set_ylabel("ΔV i nevojshëm në planet [m/s]")
@@ -195,7 +196,7 @@ def main():
         ax.set_ylim(min(P[:, 1]) - 100, REF[1])
         ax.set_xlabel("ΔV [m/s]")
         ax.set_ylabel("Koha [ditë]")
-        ax.set_title(f"Hipervëllimi i 100 zgjidhjeve: {final['hv'] / 1e6:.3f}×10⁶ (pika ref. [2500, 4000])")
+        ax.set_title(f"Hipervëllimi i {len(P)} zgjidhjeve: {final['hv'] / 1e6:.3f}×10⁶ (pika ref. [2500, 4000])")
         txt = "\n".join(f"{n}: {s / 1e6:.3f}×10⁶" for n, s in LEADERBOARD)
         ax.text(0.98, 0.97, "Renditja zyrtare:\n" + txt, transform=ax.transAxes, ha="right", va="top",
                 fontsize=8, bbox=dict(facecolor="white", alpha=0.8))

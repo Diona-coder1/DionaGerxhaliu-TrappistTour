@@ -35,8 +35,12 @@ def main():
     best_dv = min((f[0] for _, f in sols), default=float("nan"))
     print(f"{a.algo} seed {a.seed}: {len(sols)} feasible, best DV {best_dv:.1f}, HV = {hv:,.0f}, "
           f"time {time.time() - t0:.0f}s", flush=True)
+    # keep the file small: the 1000 best feasible points + their count
+    n_feasible = len(sols)
+    sols = sorted(sols, key=lambda s: s[1][0])[:1000]
     with open(out, "wb") as fh:
-        pickle.dump({"solutions": sols, "args": vars(a), "seconds": time.time() - t0, "hv": hv}, fh)
+        pickle.dump({"solutions": sols, "n_feasible": n_feasible, "args": vars(a),
+                     "seconds": time.time() - t0, "hv": hv}, fh)
 
 
 if __name__ == "__main__":

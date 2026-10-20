@@ -11,7 +11,13 @@ Rezultati vlerësohet me **hipervëllimin** e frontit Pareto (pika referuese [25
 
 ## Rezultati
 
-{{README_RESULT}}
+| | Hipervëllimi | Vendi në renditjen e SpOC 2022 |
+|---|---:|---:|
+| **Ky projekt** (beam search + CMA-ES + DP) | **5,635,615** | **3** / 20 |
+| NSGA-II, 100k vlerësime | 0 | – |
+| Kërkim i rastësishëm, 100k vlerësime | 0 | – |
+
+Zgjidhja më ekonomike: ΔV = 0.1 m/s për 2168 ditë; më e shpejta: 1690 ditë për ΔV = 2109 m/s. Dorëzimi: [`results/final/submission.json`](results/final/submission.json).
 
 ![Fronti Pareto](figures/fronti_pareto.png)
 
@@ -49,7 +55,7 @@ results/final/submission.json        zgjidhja për platformën Optimize (≤ 100
 
 ```bash
 pip install -r requirements.txt
-python -m pytest -q tests                                  # verifikimi (~10 s)
+python tests/test_astro.py && python tests/test_vec.py && python tests/test_hv.py   # verifikimi
 python scripts/verify_submission.py results/final/submission.json
 python scripts/run_beam.py --width 150                     # A4, ~13 min në 2 bërthama
 python scripts/run_baselines.py --algo nsga2 --seed 0      # A2

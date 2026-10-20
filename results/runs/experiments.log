@@ -10,3 +10,17 @@
 + python3 -W ignore scripts/run_beam.py --width 50 --root-width 80 --no-screen --out results/runs/abl_de_only.pkl
 + python3 -W ignore scripts/run_beam.py --width 50 --root-width 80 --out results/runs/beam_w50.pkl
 + python3 -W ignore scripts/run_beam.py --width 150 --root-width 300 --offsets -40 -80 --seed 2 --out results/runs/beam_offsets.pkl
++ for s in 0 1 2
++ python3 -W ignore scripts/run_baselines.py --algo nsga2 --evals 100000 --seed 0
++ python3 -W ignore scripts/run_baselines.py --algo random --evals 100000 --seed 0
++ wait
++ for s in 0 1 2
++ python3 -W ignore scripts/run_baselines.py --algo nsga2 --evals 100000 --seed 1
++ python3 -W ignore scripts/run_baselines.py --algo random --evals 100000 --seed 1
++ wait
++ for s in 0 1 2
++ python3 -W ignore scripts/run_baselines.py --algo nsga2 --evals 100000 --seed 2
++ python3 -W ignore scripts/run_baselines.py --algo random --evals 100000 --seed 2
++ wait
++ echo ALL DONE
+ALL DONE

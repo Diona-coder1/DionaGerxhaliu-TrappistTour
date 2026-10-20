@@ -65,6 +65,14 @@ def main():
         res = pool.map(_polish, [(sols[i][0], k, a.evals) for k, i in enumerate(idx)])
     polished = [r for r in res if r is not None]
     archive = sols + polished
+    # drop numerical duplicates (same tour found by several runs / polishing)
+    seen, uniq = set(), []
+    for x, f in archive:
+        key = (round(f[0], 3), round(f[1], 3))
+        if key not in seen:
+            seen.add(key)
+            uniq.append((x, f))
+    archive = uniq
     pts = np.array([f[:2] for _, f in archive])
     print(f"polished {len(polished)} tours in {time.time() - t0:.0f}s, HV = {hypervolume(pts):,.0f}", flush=True)
 

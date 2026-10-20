@@ -1,0 +1,8 @@
+1272 feasible entry nodes (3.1s)
+  level 1:   4013 candidates, kept   300, best DV      0.0 m/s, best T+h  1749.3 d  (546.2s)
+  level 2:   4351 candidates, kept   300, best DV      0.0 m/s, best T+h  1688.6 d  (344.0s)
+  level 3:   3773 candidates, kept   300, best DV      0.0 m/s, best T+h  1676.9 d  (314.3s)
+  level 4:   2486 candidates, kept   300, best DV      0.1 m/s, best T+h  1677.4 d  (262.8s)
+  level 5:   1433 candidates, kept   300, best DV      0.1 m/s, best T+h  1685.7 d  (205.1s)
+  level 6:    677 candidates, kept   677, best DV      0.1 m/s, best T+h  1689.6 d  (142.6s)
+complete feasible tours: 677   HV = 5,626,487   time 1818s

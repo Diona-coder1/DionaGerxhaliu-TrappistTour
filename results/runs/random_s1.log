@@ -1,0 +1,11 @@
+  random search 10000/100000, feasible 0 (19s)
+  random search 20000/100000, feasible 0 (42s)
+  random search 30000/100000, feasible 0 (62s)
+  random search 40000/100000, feasible 1 (85s)
+  random search 50000/100000, feasible 2 (104s)
+  random search 60000/100000, feasible 2 (122s)
+  random search 70000/100000, feasible 3 (140s)
+  random search 80000/100000, feasible 3 (159s)
+  random search 90000/100000, feasible 4 (178s)
+  random search 100000/100000, feasible 5 (198s)
+random seed 1: 5 feasible, best DV 40310.2, HV = 0, time 198s
