@@ -42,6 +42,9 @@ hv300, s300 = hv("beam_w300.pkl")
 hv10, s10 = hv("beam_w10.pkl")
 hv50, s50 = hv("beam_w50.pkl")
 hv_de, s_de = hv("abl_de_only.pkl")
+hv1200, s1200 = hv("beam_w1200.pkl")
+hv300s3, _ = hv("beam_w300_s3.pkl")
+t1200 = min(f[1] for _, f in load("beam_w1200.pkl")["solutions"])
 widths = [(10, "beam_w10.pkl"), (30, "beam_w30.pkl"), (50, "beam_w50.pkl"), (75, "beam_w75.pkl"),
           (150, "beam_main.pkl"), (300, "beam_w300.pkl")]
 W = np.array([w for w, _ in widths], dtype=float)
@@ -88,7 +91,12 @@ T["DISKUTIMI_SHKALLEZIMIT"] = (
     f"ka $R^2 = {r2:.3f}$, siç parashikon analiza teorike $O(n^2 B (m + W N_P G))$. Cilësia rritet në mënyrë "
     f"monotone por me kthim zvogëlues (*diminishing returns*): nga B = 150 në B = 300 koha dyfishohet "
     f"({s150/60:.0f} → {s300/60:.0f} min) ndërsa HV rritet me {100*(hv300-hv150)/hv150:.1f}%. "
-    "Kjo është sjellja tipike e beam search-it: gjerësia kontrollon kompromisin mes cilësisë dhe kohës.")
+    "Kjo është sjellja tipike e beam search-it: gjerësia kontrollon kompromisin mes cilësisë dhe kohës. "
+    f"Për ta testuar këtë kufi, ekzekutuam edhe B = 1200 (8 bërthama, {s1200/60:.0f} min): HV = {hv1200:,.0f}, "
+    f"pra +{100*(hv1200-hv300s3)/hv300s3:.1f}% kundrejt B = 300 me të njëjtat parametra ({hv300s3:,.0f}), "
+    f"dhe turi më i shpejtë u shkurtua në {t1200:.0f} ditë. Katërfishimi i gjerësisë jep vetëm rreth +35 000 HV; "
+    "me këtë ritëm, vendi i parë (5 870 437) do të kërkonte një beam qindra herë më të gjerë. Pra, kufiri "
+    "nuk është më fuqia llogaritëse, por familjet e tureve që dekompozimi aktual nuk i eksploron.")
 
 T["DISKUTIMI_ABLACIONIT"] = (
     "Për të kuptuar rolin e secilit komponent të gjenerimit të fëmijëve, me B = 50:\n\n"

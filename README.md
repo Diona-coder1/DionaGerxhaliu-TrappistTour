@@ -25,11 +25,11 @@ Rezultati vlerësohet me **hipervëllimin** e frontit Pareto (pika referuese [25
 
 | | Hipervëllimi | Vendi në renditjen e SpOC 2022 |
 |---|---:|---:|
-| **Ky projekt** (beam search + CMA-ES + DP) | **5,635,615** | **3** / 20 |
+| **Ky projekt** (beam search + CMA-ES + DP) | **5,667,001** | **3** / 20 |
 | NSGA-II, 100k vlerësime | 0 | – |
 | Kërkim i rastësishëm, 100k vlerësime | 0 | – |
 
-Zgjidhja më ekonomike: ΔV = 0.1 m/s për 2168 ditë; më e shpejta: 1690 ditë për ΔV = 2109 m/s. Dorëzimi: [`results/final/submission.json`](results/final/submission.json).
+Zgjidhja më ekonomike: ΔV = 0.1 m/s për 2168 ditë; më e shpejta: 1657 ditë për ΔV = 2487 m/s. Dorëzimi: [`results/final/submission.json`](results/final/submission.json).
 
 ![Fronti Pareto](figures/fronti_pareto.png)
 

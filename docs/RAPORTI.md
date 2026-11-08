@@ -42,7 +42,7 @@ gjenerike (kërkim i rastësishëm, NSGA-II), te ato që shfrytëzojnë struktur
 (kërkim *greedy*, *beam search* shumë-objektiv me dekompozim sipas hapave, CMA-ES lokal dhe
 programim dinamik për zgjedhjen optimale të nënbashkësisë).
 
-**Rezultati kryesor.** Pipeline-i i propozuar arrin hipervëllim **5,635,615** (rezultati në platformë: $-5,635,615$) me 40 zgjidhje, që do ta vendoste në **vendin e 3-të** të renditjes zyrtare të SpOC 2022. Algoritmet gjenerike, me buxhet të krahasueshëm llogaritës, nuk gjejnë asnjë zgjidhje brenda pikës referuese (hipervëllim 0).
+**Rezultati kryesor.** Pipeline-i i propozuar arrin hipervëllim **5,667,001** (rezultati në platformë: $-5,667,001$) me 55 zgjidhje, që do ta vendoste në **vendin e 3-të** të renditjes zyrtare të SpOC 2022. Algoritmet gjenerike, me buxhet të krahasueshëm llogaritës, nuk gjejnë asnjë zgjidhje brenda pikës referuese (hipervëllim 0).
 
 # Formulimi i problemit
 
@@ -289,7 +289,8 @@ Tabela 2 përmbledh të gjitha ekzekutimet. Algoritmet e rastësishme janë ekze
 | A4 vetëm DE, B = 50 | 5,388,159 | 40.2 | 1,703.3 | 90 | 162 | 1 |
 | A4 B = 150, T0 i zhvendosur (−40, −80 d) | 3,747,060 | 710.5 | 1,821.4 | 364 | 849 | 1 |
 | A4 B = 300, farë 3, DE G = 90, T0 (0, −20 d) | 5,626,487 | 0.1 | 1,689.6 | 677 | 1,818 | 1 |
-| **Pipeline i plotë A4+A5+A6 (40 zgjidhje)** | **5,635,615** | 0.1 | 1,689.6 | 40 | – | 1 |
+| A4 B = 1200, farë 3, DE G = 90, T0 (0, −20 d), 8 bërthama | 5,661,140 | 0.1 | 1,656.9 | 2,811 | 703 | 1 |
+| **Pipeline i plotë A4+A5+A6 (55 zgjidhje)** | **5,667,001** | 0.1 | 1,656.9 | 55 | – | 1 |
 
 : Krahasimi i algoritmeve (HV = hipervëllimi, sa më i madh aq më mirë; T min = koha më e shkurtër ndër zgjidhjet me ΔV < 2500 m/s).
 
@@ -308,7 +309,7 @@ Tabela 2 përmbledh të gjitha ekzekutimet. Algoritmet e rastësishme janë ekze
 
 ![Hipervëllimi dhe koha e ekzekutimit në funksion të gjerësisë $B$.](../figures/shkallezimi_beam.png){width=95%}
 
-Koha e ekzekutimit rritet **linearisht** me gjerësinë: përshtatja $t(B) \approx 4.58\,B + 37$ s ka $R^2 = 0.998$, siç parashikon analiza teorike $O(n^2 B (m + W N_P G))$. Cilësia rritet në mënyrë monotone por me kthim zvogëlues (*diminishing returns*): nga B = 150 në B = 300 koha dyfishohet (13 → 23 min) ndërsa HV rritet me 1.6%. Kjo është sjellja tipike e beam search-it: gjerësia kontrollon kompromisin mes cilësisë dhe kohës.
+Koha e ekzekutimit rritet **linearisht** me gjerësinë: përshtatja $t(B) \approx 4.58\,B + 37$ s ka $R^2 = 0.998$, siç parashikon analiza teorike $O(n^2 B (m + W N_P G))$. Cilësia rritet në mënyrë monotone por me kthim zvogëlues (*diminishing returns*): nga B = 150 në B = 300 koha dyfishohet (13 → 23 min) ndërsa HV rritet me 1.6%. Kjo është sjellja tipike e beam search-it: gjerësia kontrollon kompromisin mes cilësisë dhe kohës. Për ta testuar këtë kufi, ekzekutuam edhe B = 1200 (8 bërthama, 12 min): HV = 5,661,140, pra +0.6% kundrejt B = 300 me të njëjtat parametra (5,626,487), dhe turi më i shpejtë u shkurtua në 1657 ditë. Katërfishimi i gjerësisë jep vetëm rreth +35 000 HV; me këtë ritëm, vendi i parë (5 870 437) do të kërkonte një beam qindra herë më të gjerë. Pra, kufiri nuk është më fuqia llogaritëse, por familjet e tureve që dekompozimi aktual nuk i eksploron.
 
 ## Ablacionet
 
@@ -324,9 +325,9 @@ Përfundimi i ablacionit: komponentët plotësojnë njëri-tjetrin, dhe DE në m
 
 Pipeline-i final bashkon turet e plota nga të gjitha ekzekutimet e beam search-it, i lustron me CMA-ES dhe zgjedh me programim dinamik nënbashkësinë optimale. Rezultati:
 
-* **Hipervëllimi: 5,635,615** (rezultati në Optimize: $-5,635,615.166$), me 40 zgjidhje (fronti ka më pak se 100 pika jo-të-dominuara, prandaj përdoren të gjitha).
+* **Hipervëllimi: 5,667,001** (rezultati në Optimize: $-5,667,000.690$), me 55 zgjidhje (fronti ka më pak se 100 pika jo-të-dominuara, prandaj përdoren të gjitha).
 * Zgjidhja më ekonomike: $\Delta V = 0.1$ m/s për 2168 ditë.
-* Zgjidhja më e shpejtë: 1690 ditë për $\Delta V = 2109$ m/s.
+* Zgjidhja më e shpejtë: 1657 ditë për $\Delta V = 2487$ m/s.
 * Krahasuar me renditjen zyrtare të SpOC 2022 (1. Space Coders 5 870 437; 2. fcmaes 5 731 152; 3. Team HRI 5 601 396; 4. haiven 5 503 791), rezultati do të ishte në **vendin e 3-të** nga 20 ekipe.
 * Çdo vektor në `results/final/submission.json` është rivlerësuar me funksionin e fitnesit dhe i plotëson të dy kufizimet.
 

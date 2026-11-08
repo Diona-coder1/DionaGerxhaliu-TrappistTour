@@ -67,6 +67,7 @@ def main():
     rows.append(summary_row("A4 vetëm DE, B = 50", [load("abl_de_only.pkl")]))
     rows.append(summary_row("A4 B = 150, T0 i zhvendosur (−40, −80 d)", [load("beam_offsets.pkl")]))
     rows.append(summary_row("A4 B = 300, farë 3, DE G = 90, T0 (0, −20 d)", [load("beam_w300_s3.pkl")]))
+    rows.append(summary_row("A4 B = 1200, farë 3, DE G = 90, T0 (0, −20 d), 8 bërthama", [load("beam_w1200.pkl")]))
     rows = [r for r in rows if r is not None]
 
     final = None
@@ -112,7 +113,13 @@ def main():
             sec.append(d["seconds"] / 60)
     if ws:
         fig, ax = plt.subplots(1, 2, figsize=(11, 4))
-        ax[0].plot(ws, hv, "o-")
+        ax[0].plot(ws, hv, "o-", label="farë 0–1, DE G = 60")
+        wide = [(w, load(n)) for w, n in ((300, "beam_w300_s3.pkl"), (1200, "beam_w1200.pkl"))]
+        wide = [(w, hypervolume(pts_of(d)) / 1e6) for w, d in wide if d]
+        if wide:
+            ax[0].plot([w for w, _ in wide], [h for _, h in wide], "s--", color="tab:purple",
+                       label="farë 3, DE G = 90, T0 (0, −20 d)")
+            ax[0].legend(fontsize=8)
         ax[0].set_xscale("log")
         ax[0].set_xlabel("Gjerësia e beam-it B")
         ax[0].set_ylabel("Hipervëllimi [×10⁶]")
